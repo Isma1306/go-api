@@ -66,7 +66,8 @@ func CreateArticle(article types.Article) string {
 	if err != nil {
 		log.Fatal(err)
 	}
-	newId := response.InsertedID.(primitive.ObjectID).String()
+	newId := response.InsertedID.(primitive.ObjectID).Hex()
+
 	return newId
 }
 
@@ -83,4 +84,30 @@ func UpdateArticle(article types.Article, id string) (mongo.UpdateResult, error)
 	}
 	fmt.Println(response)
 	return *response, nil
+}
+func DeleteArticle(id string) (mongo.DeleteResult, error) {
+	fmt.Println(" DB Delete article")
+	idPrimitive, _ := primitive.ObjectIDFromHex(id)
+	filter := bson.D{{Key: "_id", Value: idPrimitive}}
+	response, err := collection.DeleteOne(ctx, filter)
+	if err != nil {
+		return *response, err
+
+	}
+	fmt.Println(response)
+	return *response, nil
+}
+
+func GetArticle(id string) (primitive.M, error) {
+	fmt.Println(" DB Delete article")
+	idPrimitive, _ := primitive.ObjectIDFromHex(id)
+	filter := bson.D{{Key: "_id", Value: idPrimitive}}
+	var response bson.M
+	err := collection.FindOne(ctx, filter).Decode(&response)
+	if err != nil {
+		return response, err
+
+	}
+	fmt.Println(response)
+	return response, nil
 }

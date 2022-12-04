@@ -16,10 +16,10 @@ func HomePage(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Endpoint Hit: homePage")
 }
 
-var articles = []types.Article{
-	{Id: "1", Title: "Hello", Desc: "Article Description", Content: "Article Content"},
-	{Id: "2", Title: "Hello 2", Desc: "Article Description", Content: "Article Content"},
-}
+// var articles = []types.Article{
+// 	{Id: "1", Title: "Hello", Desc: "Article Description", Content: "Article Content"},
+// 	{Id: "2", Title: "Hello 2", Desc: "Article Description", Content: "Article Content"},
+// }
 
 func ReturnAllArticles(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Endpoint Hit: returnAllArticles")
@@ -30,12 +30,14 @@ func ReturnAllArticles(w http.ResponseWriter, r *http.Request) {
 func ReturnSingleArticle(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Endpoint Hit: single article")
 	vars := mux.Vars(r)
-	key := vars["id"]
-	for _, article := range articles {
-		if article.Id == key {
-			json.NewEncoder(w).Encode(article)
-		}
+	id := vars["id"]
+	response, err := db.GetArticle(id)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode("Something went really wrong!")
 	}
+
+	json.NewEncoder(w).Encode(response)
 
 }
 func CreateNewArticle(w http.ResponseWriter, r *http.Request) {
@@ -52,11 +54,17 @@ func DeleteArticle(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Endpoint Hit: Delete article")
 	vars := mux.Vars(r)
 	id := vars["id"]
-	for index, article := range articles {
-		if article.Id == id {
-			articles = append(articles[:index], articles[index+1:]...)
-			json.NewEncoder(w).Encode(article)
-		}
+	response, err := db.DeleteArticle(id)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode("Something went really wrong!")
+	}
+	if response.DeletedCount == 0 {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode("that article doesnt exist")
+
+	} else {
+		json.NewEncoder(w).Encode("Article deleted!")
 	}
 
 }
