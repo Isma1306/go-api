@@ -43,8 +43,8 @@ func Prompt() {
 	// username := getName()
 	// password := getPass()
 	// uncomment and write it here if you dont want the prompt
-	username := "golang"
-	password := "NlEag3qXsgpCCsrX"
+	username := "YourUserName"
+	password := "YourPassword"
 	Uri = createURI(username, password)
 }
 
