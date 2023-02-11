@@ -50,5 +50,4 @@ func Prompt() {
 
 func createURI(username, password string) string {
 	return "mongodb+srv://" + username + ":" + password + "@cluster0.dqwwc.mongodb.net/test?retryWrites=true&w=majority"
-
 }
